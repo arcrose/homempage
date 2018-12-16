@@ -1,0 +1,12 @@
+[package]
+name = "arcrose-homempage"
+version = "0.1.0"
+authors = ["Emma Rose <emma.arcadia.rose@gmail.com>"]
+
+[dependencies]
+rocket = "^0.4"
+
+[dependencies.rocket_contrib]
+version = "^0.4"
+default-features = false
+features = ["tera_templates"]
