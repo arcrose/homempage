@@ -6,13 +6,29 @@ extern crate rocket_contrib;
 use std::collections::HashMap;
 use std::path::Path;
 
-use rocket::response::NamedFile;
+use rocket::{
+  http::ContentType,
+  response::{NamedFile, Response},
+};
 use rocket_contrib::templates::Template;
 
 
 #[get("/css/<filename>")]
-fn css(filename: String) -> Option<NamedFile> {
-  NamedFile::open(Path::new("css/").join(filename)).ok()
+fn css<'r>(filename: String) -> Response<'r> {
+  let file_path = Path::new("css/").join(filename);
+
+  if let Some(file) = NamedFile::open(file_path).ok() {
+    Response::build()
+      .header(ContentType::CSS)
+      .sized_body(file)
+      .finalize()
+  } else {
+    let err_msg = "No such file";
+    Response::build()
+      .header(ContentType::Plain)
+      .sized_body(::std::io::Cursor::new(err_msg))
+      .finalize()
+  }
 }
 
 #[get("/")]
