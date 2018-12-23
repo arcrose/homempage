@@ -1,9 +1,11 @@
 <!doctype html>
 <html>
   <head>
-    <link rel="stylesheet" src="css/main.css" />
+    <link rel="stylesheet" href="css/main.css" />
   </head>
   <body>
-    {% block content %}{% endblock content %}
+    <div id="content">
+      {% block content %}{% endblock content %}
+    </div>
   </body>
 </html>
