@@ -17,7 +17,7 @@ use rocket_contrib::templates::Template;
 fn css<'r>(filename: String) -> Response<'r> {
   let file_path = Path::new("css/").join(filename);
 
-  if let Some(file) = NamedFile::open(file_path).ok() {
+  if let Ok(file) = NamedFile::open(file_path) {
     Response::build()
       .header(ContentType::CSS)
       .sized_body(file)
