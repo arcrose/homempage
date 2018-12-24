@@ -9,7 +9,8 @@ use rocket::{
   response::{
     content::Html,
     NamedFile,
-    Response
+    Redirect,
+    Response,
   },
 };
 
@@ -55,8 +56,14 @@ fn index() -> Html<NamedFile> {
   Html(NamedFile::open("html/index.html").unwrap())
 }
 
+#[catch(404)]
+fn not_found() -> Redirect {
+  Redirect::to(uri!(index))
+}
+
 fn main() {
   rocket::ignite()
+    .register(catchers![not_found])
     .mount("/", routes![index, css, js])
     .launch();
 }
