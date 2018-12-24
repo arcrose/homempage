@@ -10,7 +10,17 @@
       preserveAspectRatio="none"
       fill="#17546d"
     >
-      <polygon points="0,0 100,0 0,100" />
+      <style>
+        .code {
+          fill: white;
+          font-family: "Inconsolata", monospace;
+          font-size: 20%;
+        }
+      </style>
+      <a href="https://github.com/arcrose/">
+        <polygon points="0,0 100,0 0,100" />
+      </a>
+      <text x="3" y="5" class="code">for {</text>
     </svg>
   </div>
 </div>
@@ -31,7 +41,9 @@
       preserveAspectRatio="none"
       fill="white"
     >
-      <polygon points="100,100 100,0 0,100" />
+      <a href="https://medium.com/@emma.arcadia.rose">
+        <polygon points="100,100 100,0 0,100" />
+      </a>
     </svg>
   </div>
 </div>
