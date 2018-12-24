@@ -20,7 +20,6 @@
       <a href="https://github.com/arcrose/">
         <polygon points="0,0 100,0 0,100" />
       </a>
-      <text x="3" y="5" class="code">for {</text>
     </svg>
   </div>
 </div>
@@ -47,4 +46,5 @@
     </svg>
   </div>
 </div>
+
 {% endblock content %}

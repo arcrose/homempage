@@ -31,6 +31,24 @@ fn css<'r>(filename: String) -> Response<'r> {
   }
 }
 
+#[get("/js/<filename>")]
+fn js<'r>(filename: String) -> Response<'r> {
+  let file_path = Path::new("js/").join(filename);
+
+  if let Ok(file) = NamedFile::open(file_path) {
+    Response::build()
+      .header(ContentType::JavaScript)
+      .sized_body(file)
+      .finalize()
+  } else {
+    let err_msg = "No such file";
+    Response::build()
+      .header(ContentType::Plain)
+      .sized_body(::std::io::Cursor::new(err_msg))
+      .finalize()
+  }
+}
+
 #[get("/")]
 fn index() -> Template {
   let context: HashMap<String, String> = HashMap::new();
@@ -39,7 +57,7 @@ fn index() -> Template {
 
 fn main() {
   rocket::ignite()
-    .mount("/", routes![index, css])
+    .mount("/", routes![index, css, js])
     .attach(Template::fairing())
     .launch();
 }
