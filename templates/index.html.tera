@@ -1,5 +1,29 @@
 {% extends "base" %}
 
 {% block content %}
-<h1>Hello, world!</h1>
+<div>
+  <div id="code-container">
+    <svg 
+      id="diagonal-code-segment"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+      fill="#17546d"
+    >
+      <polygon points="0,0 100,0 0,100" />
+    </svg>
+  </div>
+</div>
+<div>
+  <div id="writing-container">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+      fill="white"
+    >
+      <polygon points="100,100 100,0 0,100" />
+    </svg>
+  </div>
+</div>
 {% endblock content %}
