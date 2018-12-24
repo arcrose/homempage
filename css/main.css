@@ -9,11 +9,39 @@ body {
   background-color: #ffecf1;
 }
 
+svg {
+  display: block;
+}
+
+p {
+  font-family: "Inconsolata", monospace;
+  line-height: 0.5em;
+  color: #696ea7;
+}
+
+p#name {
+  font-family: "Press Start 2P";
+  font-size: 1.5em;
+}
+
 div#code-container {
   display: inline;
   position: absolute;
   width: 45%;
   left: 0;
+}
+
+div#personal-container {
+  display: inline;
+  position: absolute;
+  width: 33%;
+  left: 45%;
+  top: 40%;
+}
+
+div#personal-container div {
+  margin-left: auto;
+  margin-right: auto;
 }
 
 div#writing-container {
@@ -22,8 +50,4 @@ div#writing-container {
   width: 45%;
   right: 0;
   bottom: 0;
-}
-
-svg {
-  display: block;
 }

@@ -14,6 +14,15 @@
     </svg>
   </div>
 </div>
+<div id="personal-container">
+  <div>
+    <p id="name">Emma</p>
+    <p>Security Engineer @ Mozilla;</p>
+    <p>BSc. Computer Science;</p>
+    <p>Electric bass guitar player;</p>
+    <p>Cyclist;</p>
+  </div>
+</div>
 <div>
   <div id="writing-container">
     <svg
