@@ -1,16 +1,17 @@
 #![feature(custom_attribute, proc_macro_hygiene, decl_macro)]
 
 #[macro_use] extern crate rocket;
-extern crate rocket_contrib;
 
-use std::collections::HashMap;
 use std::path::Path;
 
 use rocket::{
   http::ContentType,
-  response::{NamedFile, Response},
+  response::{
+    content::Html,
+    NamedFile,
+    Response
+  },
 };
-use rocket_contrib::templates::Template;
 
 
 #[get("/css/<filename>")]
@@ -50,14 +51,12 @@ fn js<'r>(filename: String) -> Response<'r> {
 }
 
 #[get("/")]
-fn index() -> Template {
-  let context: HashMap<String, String> = HashMap::new();
-  Template::render("index", context)
+fn index() -> Html<NamedFile> {
+  Html(NamedFile::open("html/index.html").unwrap())
 }
 
 fn main() {
   rocket::ignite()
     .mount("/", routes![index, css, js])
-    .attach(Template::fairing())
     .launch();
 }
