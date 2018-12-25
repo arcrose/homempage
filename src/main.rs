@@ -51,6 +51,11 @@ fn js<'r>(filename: String) -> Response<'r> {
   }
 }
 
+#[get("/resume")]
+fn resume() -> Html<NamedFile> {
+  Html(NamedFile::open("html/resume.html").unwrap())
+}
+
 #[get("/")]
 fn index() -> Html<NamedFile> {
   Html(NamedFile::open("html/index.html").unwrap())
@@ -64,6 +69,6 @@ fn not_found() -> Redirect {
 fn main() {
   rocket::ignite()
     .register(catchers![not_found])
-    .mount("/", routes![index, css, js])
+    .mount("/", routes![index, resume, css, js])
     .launch();
 }
