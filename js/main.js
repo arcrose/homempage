@@ -1,5 +1,5 @@
 (function() {
-  const drawText = (container, x, y, classes, text) => {
+  const text = (x, y, classes, text) => {
     let newNode = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     newNode.setAttribute('x', `${x}`)
     newNode.setAttribute('y', `${y}`)
@@ -9,14 +9,15 @@
       newNode.classList.add(className)
     }
 
-    container.appendChild(newNode)
-
     return newNode
   }
 
   const codeSegment = document.getElementById('diagonal-code-segment')
   const writingSegment = document.getElementById('diagonal-writing-segment')
 
-  drawText(codeSegment, 3, 5, ['code', 'red'], 'def test():')
-  drawText(codeSegment, 9, 8, ['code', 'blue'], 'print("Hello, world")')
+  const codeSegmentTop = [3, 5]            // Start drawing code from x=3, y=5
+  const codeSegmentIdentLineDelta = [5, 3] // Add x+5, y+3 to indent the next line of code
+
+  codeSegment.appendChild(text(3, 5, ['code', 'red'], 'def test():'))
+  codeSegment.appendChild(text(9, 8, ['code', 'blue'], 'print("Hello, world")'))
 })()
