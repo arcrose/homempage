@@ -69,27 +69,55 @@
     }
   }
 
+  const schedule = (initState, loopPause, operations) => ({
+    _state: initState,
+    _loop: loopPause,
+    _ops: operations,
+    _index: 0,
+  })
+
+  const _run = schedule => {
+    setTimeout(() => {
+      const op = schedule._ops[schedule._index]
+      schedule._state = op(schedule._state)
+      schedule._index = (schedule._index + 1) % schedule._ops.length
+      _run(schedule)
+    }, schedule._loop)
+  }
+
+  const drawCode = ({ animator, nodes }) => {
+    const { animator: a, nodes: n } = _animatorStep(animator)
+
+    for (const node of n) {
+      codeSegment.appendChild(node)
+      nodes.push(node)
+    }
+
+    return {
+      animator: a,
+      nodes: nodes,
+    }
+  }
+
+  const clearText = ({ animator, nodes }) => {
+    for (let i = 0; i < nodes.length; i++) {
+      nodes[i].remove()
+    }
+    return {
+      animator,
+      nodes: [],
+    }
+  }
+
   const language = CODE_SNIPPETS[0].languageName
   const sources = CODE_SNIPPETS[0].sourceFiles
-  let animator = codeAnimator(language, sources[0])
 
-  let i = 0
-  for (i = 0; i < 5; i++) {
-    setTimeout(() => {
-      let { animator: anim , nodes } = _animatorStep(animator)
-      animator = anim
-      console.log(animator)
-      console.log(nodes)
-      for (const node of nodes) {
-        codeSegment.appendChild(node)
-      }
-      setTimeout(() => {
-        let txts = document.getElementsByTagName('text')
-        let i = 0
-        for (i = 0; i < txts.length; i++) {
-          txts[i].remove()
-        }
-      }, 100)
-    }, i * 1000)
+  let animator = codeAnimator(language, sources[0])
+  let state = {
+    animator,
+    nodes: [],
   }
+  let sched = schedule(state, 500, [ drawCode, clearText ])
+
+  _run(sched)
 })()
