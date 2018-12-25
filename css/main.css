@@ -51,3 +51,22 @@ div#writing-container {
   right: 0;
   bottom: 0;
 }
+
+/** SVG TEXT **/
+
+.code {
+  font-family: "Inconsolata", monospace;
+  font-size: 18%;
+}
+.word {
+  font-family: 'Roboto', sans-serif;
+  font-size: 18%;
+  font-weight: 700;
+}
+.red { fill: #ff6db3; }
+.green { fill: #4ed7cc; }
+.blue { fill: #6ec3ff; }
+.yellow { fill: #ffe8a1; }
+.purple { fill: #cda4f5; }
+.white { fill: #e0e2e4; }
+.black { fill: #4b4747; }

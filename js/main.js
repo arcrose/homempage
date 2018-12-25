@@ -20,4 +20,6 @@
 
   codeSegment.appendChild(text(3, 5, ['code', 'red'], 'def test():'))
   codeSegment.appendChild(text(9, 8, ['code', 'blue'], 'print("Hello, world")'))
+
+  writingSegment.appendChild(text(10, 95, ['word', 'black'], 'Test'))
 })()
