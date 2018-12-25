@@ -18,7 +18,7 @@
     const startX = indent * codeSegmentIdentLineDelta[0] + codeSegmentTop[0]
     const startY = line * codeSegmentIdentLineDelta[1] + codeSegmentTop[1]
 
-    const charLimit = 64 - 2.25 * line - 5 * indent
+    const charLimit = 64 * (1284 / window.innerWidth) - 2.25 * line - 5 * indent
 
     return text(startX, startY, 'code', code.slice(0, charLimit))
   }
