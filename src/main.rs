@@ -1,6 +1,10 @@
 #![feature(custom_attribute, proc_macro_hygiene, decl_macro)]
 
 #[macro_use] extern crate rocket;
+extern crate serde;
+#[macro_use] extern crate serde_derive;
+
+mod code;
 
 use std::path::Path;
 
@@ -67,6 +71,10 @@ fn not_found() -> Redirect {
 }
 
 fn main() {
+  match code::analyze("./snippets") {
+    Ok(source_dirs) => println!("Got source directories: {:?}", source_dirs),
+    Err(error)      => panic!("Code analysis failed: {}", error),
+  }
   rocket::ignite()
     .register(catchers![not_found])
     .mount("/", routes![index, resume, css, js])
