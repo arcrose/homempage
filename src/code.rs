@@ -105,7 +105,7 @@ fn process<P: AsRef<Path>>(file_path: P) -> Result<Source, io::Error> {
   }
 }
 
-fn proceed(mut state: IndentCounterSM) -> IndentCounterSM {
+fn proceed(state: IndentCounterSM) -> IndentCounterSM {
   if let IndentCounterSM::Processing{
     file_name,
     mut lines,

@@ -3,9 +3,12 @@
 #[macro_use] extern crate rocket;
 extern crate serde;
 #[macro_use] extern crate serde_derive;
+extern crate serde_json;
 
 mod code;
 
+use std::fs;
+use std::io::Write;
 use std::path::Path;
 
 use rocket::{
@@ -71,10 +74,19 @@ fn not_found() -> Redirect {
 }
 
 fn main() {
-  match code::analyze("./snippets") {
-    Ok(source_dirs) => println!("Got source directories: {:?}", source_dirs),
+  let analysis = code::analyze("./snippets")
+    .map(|dirs| serde_json::to_vec(&dirs).unwrap());
+  let source_dirs = match analysis {
+    Ok(source_dirs) => source_dirs,
     Err(error)      => panic!("Code analysis failed: {}", error),
-  }
+  };
+  let mut code_snippets_js = fs::OpenOptions::new()
+    .write(true)
+    .open("./js/code_snippets.js")
+    .expect("Could not open js/code_snippets.js");
+  code_snippets_js.write(b"const CODE_SNIPPETS = ").unwrap();
+  code_snippets_js.write_all(&source_dirs).unwrap();
+
   rocket::ignite()
     .register(catchers![not_found])
     .mount("/", routes![index, resume, css, js])
