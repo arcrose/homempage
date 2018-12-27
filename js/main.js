@@ -109,10 +109,9 @@
     }
   }
 
-  const language = CODE_SNIPPETS[0].languageName
-  const sources = CODE_SNIPPETS[0].sourceFiles
+  const snippet = CODE_SNIPPETS.find((snippet) => snippet.sourceFiles.length > 0)
 
-  let animator = codeAnimator(language, sources[0])
+  let animator = codeAnimator(snippet.languageName, snippet.sourceFiles[0])
   let state = {
     animator,
     nodes: [],
