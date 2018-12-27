@@ -1,5 +1,5 @@
 use std::fs;
-use std::io;
+use std::io::{self, Read};
 use std::path::Path;
 
 
@@ -55,7 +55,7 @@ pub fn analyze<P: AsRef<Path>>(directory: P) -> AnalysisResult {
       .filter(|path| path.is_file());
 
     for file in files {
-      let source = process(&language, file)?;
+      let source = process(file)?;
       sources.push(source);
     }
 
@@ -68,9 +68,99 @@ pub fn analyze<P: AsRef<Path>>(directory: P) -> AnalysisResult {
   Ok(source_dirs)
 }
 
-fn process<S, P>(language_name: S, file_path: P) -> Result<Source, io::Error> {
-  Ok(Source {
-    file_name: "test".to_string(),
-    lines_of_code: vec![],
-  })
+enum IndentCounterSM {
+  Start {
+    source_code: String,
+  },
+  Processing {
+    file_name: String,
+    lines: Vec<Line>,
+    processing_index: usize,
+    indent_guess: String,
+  },
+  Finished(Source),
+}
+
+fn process<P: AsRef<Path>>(file_path: P) -> Result<Source, io::Error> {
+  use self::IndentCounterSM::*;
+
+  let file_name = file_path
+    .as_ref()
+    .file_name()
+    .unwrap()
+    .to_str()
+    .unwrap()
+    .to_string();
+  let mut source_code = String::new();
+  fs::File::open(file_path)
+    ?.read_to_string(&mut source_code)?;
+
+  let mut state = Start{ source_code };
+  loop {
+    state = match state {
+      Start{ source_code } => tokenize(file_name.clone(), source_code),
+      p@Processing{ .. }   => proceed(p),
+      Finished(source)     => return Ok(source),
+    }
+  }
+}
+
+fn proceed(mut state: IndentCounterSM) -> IndentCounterSM {
+  if let IndentCounterSM::Processing{
+    file_name,
+    mut lines,
+    processing_index,
+    indent_guess,
+  } = state {
+    // Finished condition
+    if processing_index >= lines.len() {
+      IndentCounterSM::Finished(Source {
+        file_name,
+        lines_of_code: lines,
+      })
+    } else {
+      let (new_line, new_indent_guess) = update(&lines[processing_index], &indent_guess);
+      lines[processing_index] = new_line;
+
+      IndentCounterSM::Processing {
+        file_name,
+        lines,
+        processing_index: processing_index + 1,
+        indent_guess: new_indent_guess,
+      }
+    }
+  } else {
+    state
+  }
+}
+
+fn update<S: AsRef<str>>(line: &Line, indent_guess: S) -> (Line, String) {
+  let line = Line {
+    number: line.number,
+    indent: line.indent,
+    code: line.code.clone(),
+  };
+
+  (line, "".to_string())
+}
+
+fn tokenize(file_name: String, source_code: String) -> IndentCounterSM {
+  let mut lines = Vec::new();
+  let mut line_no = 0;
+
+  for line_str in source_code.split("\n") {
+    lines.push(Line {
+      number: line_no,
+      indent: 0,
+      code: line_str.to_string(),
+    });
+    line_no += 1;
+  }
+
+  IndentCounterSM::Processing {
+    file_name,
+    lines,
+    processing_index: 0,
+    indent_guess: "    ".to_string(),
+  }
 }
