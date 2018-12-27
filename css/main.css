@@ -23,6 +23,11 @@ a {
   color: inherit;
   text-decoration: underline;
   font-weight: 700;
+  outline: 0;
+}
+
+a:hover, a:active, a:focus {
+  color: #17546d;
 }
 
 p#name {
@@ -62,17 +67,12 @@ div#writing-container {
 
 .code {
   font-family: "Inconsolata", monospace;
-  font-size: 18%;
+  font-size: 15%;
+  fill: #ffecf1;
 }
 .word {
   font-family: 'Roboto', sans-serif;
   font-size: 18%;
   font-weight: 700;
+  fill: #696ea7;
 }
-.red { fill: #ff6db3; }
-.green { fill: #4ed7cc; }
-.blue { fill: #6ec3ff; }
-.yellow { fill: #ffe8a1; }
-.purple { fill: #cda4f5; }
-.white { fill: #e0e2e4; }
-.black { fill: #4b4747; }
