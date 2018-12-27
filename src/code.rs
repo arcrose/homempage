@@ -76,7 +76,7 @@ enum IndentCounterSM {
     file_name: String,
     lines: Vec<Line>,
     processing_index: usize,
-    indent_guess: String,
+    indent_guess: &'static str,
   },
   Finished(Source),
 }
@@ -119,7 +119,7 @@ fn proceed(mut state: IndentCounterSM) -> IndentCounterSM {
         lines_of_code: lines,
       })
     } else {
-      let (new_line, new_indent_guess) = update(&lines[processing_index], &indent_guess);
+      let (new_line, new_indent_guess) = update_indent_guess(&lines[processing_index], indent_guess);
       lines[processing_index] = new_line;
 
       IndentCounterSM::Processing {
@@ -134,14 +134,38 @@ fn proceed(mut state: IndentCounterSM) -> IndentCounterSM {
   }
 }
 
-fn update<S: AsRef<str>>(line: &Line, indent_guess: S) -> (Line, String) {
-  let line = Line {
+fn update_indent_guess(line: &Line, indent_guess: &'static str) -> (Line, &'static str) {
+  let mut line = Line {
     number: line.number,
     indent: line.indent,
     code: line.code.clone(),
   };
 
-  (line, "".to_string())
+  if line.code.starts_with(" ") {
+    let num_spaces = line.code
+      .chars()
+      .take_while(|&c| c == ' ')
+      .collect::<Vec<char>>()
+      .len();
+    if num_spaces % 4 == 0 {
+      line.indent = (num_spaces / 4) as u32;
+
+      (line, "    ")
+    } else {
+      line.indent = (num_spaces / 2) as u32;
+
+      (line, "  ")
+    }
+  } else {
+    let num_tabs = line.code
+      .chars()
+      .take_while(|&c| c == '\t')
+      .collect::<Vec<char>>()
+      .len();
+    line.indent = num_tabs as u32;
+
+    (line, "\t")
+  }
 }
 
 fn tokenize(file_name: String, source_code: String) -> IndentCounterSM {
@@ -161,6 +185,6 @@ fn tokenize(file_name: String, source_code: String) -> IndentCounterSM {
     file_name,
     lines,
     processing_index: 0,
-    indent_guess: "    ".to_string(),
+    indent_guess: "    ",
   }
 }
