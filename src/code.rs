@@ -147,14 +147,14 @@ fn update_indent_guess(line: &Line, indent_guess: &'static str) -> (Line, &'stat
       .take_while(|&c| c == ' ')
       .collect::<Vec<char>>()
       .len();
-    if num_spaces % 4 == 0 {
-      line.indent = (num_spaces / 4) as u32;
-
-      (line, "    ")
-    } else {
+    if num_spaces % 4 != 0 && indent_guess == "    " {
       line.indent = (num_spaces / 2) as u32;
 
       (line, "  ")
+    } else {
+      line.indent = (num_spaces / 4) as u32;
+
+      (line, "    ")
     }
   } else {
     let num_tabs = line.code
@@ -185,6 +185,6 @@ fn tokenize(file_name: String, source_code: String) -> IndentCounterSM {
     file_name,
     lines,
     processing_index: 0,
-    indent_guess: "    ",
+    indent_guess: "\t",
   }
 }
