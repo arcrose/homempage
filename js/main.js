@@ -2,7 +2,7 @@
   const codeSegment = document.getElementById('diagonal-code-segment')
   const writingSegment = document.getElementById('diagonal-writing-segment')
 
-  const codeSegmentMaxLines = 30
+  const codeSegmentMaxLines = 36
   const codeSegmentTop = [3, 5]            // Start drawing code from x=3, y=5
   const codeSegmentIdentLineDelta = [6, 3] // Add x+5, y+3 to indent the next line of code
 
@@ -24,9 +24,7 @@
     const startX = indent * codeSegmentIdentLineDelta[0] + codeSegmentTop[0]
     const startY = line * codeSegmentIdentLineDelta[1] + codeSegmentTop[1]
 
-    const charLimit = 80 - (3.15 * line) - (4 * indent)
-
-    return text(startX, startY, 'code', code.slice(0, charLimit))
+    return text(startX, startY, 'code', code)
   }
 
   // Construct a representation of a state machine that can be operated on
