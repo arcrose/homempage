@@ -4,7 +4,7 @@
 
   const codeSegmentMaxLines = 36
   const codeSegmentTop = [3, 5]            // Start drawing code from x=3, y=5
-  const codeSegmentIdentLineDelta = [6, 3] // Add x+5, y+3 to indent the next line of code
+  const codeSegmentIdentLineDelta = [6, 3] // Add x+6, y+3 to indent the next line of code
 
   // Produce an HTML <text> element positioned at the given coordinates.
   const text = (x, y, className, text) => {
@@ -100,6 +100,19 @@
     }
   }
 
+  const drawAllCode = animator => {
+    const { animator: a, nodes } = _animatorStep(animator)
+
+    for (const node of nodes) {
+      codeSegment.appendChild(node)
+    }
+
+    return {
+      animator: a,
+      nodes,
+    }
+  }
+
   const prepareAnimator = ({ animator, nodes }) => {
     if (animator._startLine === animator._source.linesOfCode.length - codeSegmentMaxLines) {
       animator = resetAnimator(animator)
@@ -126,9 +139,12 @@
   const main = () => {
     const snippet = pickRandom(CODE_SNIPPETS)
     const source = pickRandom(snippet.sourceFiles)
-    let animator = codeAnimator(snippet.languageName, source)
-    let sched = schedule({ animator, nodes: [] }, 75, [ drawCode, prepareAnimator ])
 
+    let animator = codeAnimator(snippet.languageName, source)
+    let { animator: a, nodes }  = drawAllCode(animator)
+    animator = a
+
+    let sched = schedule({ animator, nodes: nodes }, 75, [ drawCode, prepareAnimator ])
     _run(sched)
   }
 
