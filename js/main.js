@@ -36,8 +36,13 @@
     _linesToShow: 0,
     _language: language,
     _source: source,
-    _animationRate: 0.35,
   })
+
+  const resetAnimator = ({ language }) => {
+    const snippet = pickRandom(CODE_SNIPPETS)
+    const source = pickRandom(snippet.sourceFiles)
+    return codeAnimator(language, source)
+  }
 
   const _animatorStep = animator => {
     const codeToText = (state, line) => {
@@ -96,6 +101,7 @@
     }
     if (n.length > nodes.length) {
       newNodes.push(n[n.length - 1])
+      codeSegment.appendChild(n[n.length - 1])
     }
 
     return {
@@ -104,14 +110,31 @@
     }
   }
 
-  const snippet = CODE_SNIPPETS.find((snippet) => snippet.sourceFiles.length > 0)
+  const prepareAnimator = ({ animator, nodes }) => {
+    if (animator._startLine === animator._source.linesOfCode.length - codeSegmentMaxLines) {
+      animator = resetAnimator(animator)
+    }
+    return {
+      animator,
+      nodes,
+    }
+  }
 
-  let animator = codeAnimator(snippet.languageName, snippet.sourceFiles[0])
+  const pickRandom = (list) => {
+    const index = Math.floor((Math.random() * 100000) % list.length)
+    return list[index]
+  }
+
+
+  const snippet = pickRandom(CODE_SNIPPETS)
+  const source = pickRandom(snippet.sourceFiles)
+
+  let animator = codeAnimator(snippet.languageName, source)
   let state = {
     animator,
     nodes: [],
   }
-  let sched = schedule(state, 300, [ drawCode ])
+  let sched = schedule(state, 150, [ drawCode, prepareAnimator ])
 
   _run(sched)
 })()
