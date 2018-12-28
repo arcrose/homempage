@@ -102,9 +102,7 @@
 
   const prepareAnimator = ({ animator, nodes }) => {
     if (animator._startLine === animator._source.linesOfCode.length - codeSegmentMaxLines) {
-      const lines = animator._linesToShow
-      animator = randomAnimator()
-      animator._linesToShow = lines
+      animator = resetAnimator(animator)
     }
     return {
       animator,
@@ -112,10 +110,12 @@
     }
   }
   
-  const randomAnimator = () => {
+  const resetAnimator = (animator) => {
     const snippet = pickRandom(CODE_SNIPPETS)
     const source = pickRandom(snippet.sourceFiles)
-    return codeAnimator(snippet.languageName, source)
+    animator._source = source
+    animator._startLine = 0
+    return animator
   }
 
   const pickRandom = (list) => {
@@ -124,7 +124,9 @@
   }
 
   const main = () => {
-    let animator = randomAnimator()
+    const snippet = pickRandom(CODE_SNIPPETS)
+    const source = pickRandom(snippet.sourceFiles)
+    let animator = codeAnimator(snippet.languageName, source)
     let sched = schedule({ animator, nodes: [] }, 75, [ drawCode, prepareAnimator ])
 
     _run(sched)

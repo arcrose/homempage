@@ -82,6 +82,7 @@ fn main() {
   };
   let mut code_snippets_js = fs::OpenOptions::new()
     .write(true)
+    .create(true)
     .open("./js/code_snippets.js")
     .expect("Could not open js/code_snippets.js");
   code_snippets_js.write(b"const CODE_SNIPPETS = ").unwrap();
