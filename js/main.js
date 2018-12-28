@@ -30,19 +30,17 @@
   // Construct a representation of a state machine that can be operated on
   // to animate text scrolling through the code segment.
   const codeAnimator = (language, source) => ({
-    _startLine: 0,
-    _linesToShow: 0,
+    _startLine: codeSegmentMaxLines,
+    _linesBuffer: source.linesOfCode.slice(0, codeSegmentMaxLines),
     _language: language,
     _source: source,
   })
 
-  const resetAnimator = ({ language }) => {
-    const snippet = pickRandom(CODE_SNIPPETS)
-    const source = pickRandom(snippet.sourceFiles)
-    return codeAnimator(language, source)
-  }
-
   const _animatorStep = animator => {
+    animator._linesBuffer = animator._linesBuffer.slice(1)
+    animator._linesBuffer.push(animator._source.linesOfCode[animator._startLine])
+    animator._startLine++
+
     const codeToText = (state, line) => {
       state.nodes.push(code(state.lineNumber, line.indent, line.code))
       return {
@@ -50,22 +48,13 @@
         lineNumber: state.lineNumber + 1,
       }
     }
-    const linesToShow = Math.min(codeSegmentMaxLines, animator._linesToShow + 1)
-    const source = animator._source.linesOfCode.slice(
-      animator._startLine,
-      animator._startLine + linesToShow)
-
-    if (linesToShow === animator._linesToShow) {
-      animator._startLine += 1
-    }
-    animator._linesToShow = linesToShow
     
     let init = {
       nodes: [],
       lineNumber: 0,
     }
 
-    const { nodes } = FN.reduce(codeToText, source, init)
+    const { nodes } = FN.reduce(codeToText, animator._linesBuffer, init)
     return {
       animator,
       nodes,
@@ -94,12 +83,15 @@
     let newNodes = []
     for (let i = 0; i < nodes.length; i++) {
       nodes[i].remove();
-      newNodes.push(n[i])
-      codeSegment.appendChild(n[i])
+
+      const node = n[i]
+      newNodes.push(node)
+      codeSegment.appendChild(node)
     }
     if (n.length > nodes.length) {
-      newNodes.push(n[n.length - 1])
-      codeSegment.appendChild(n[n.length - 1])
+      const node = n[n.length - 1]
+      newNodes.push(node)
+      codeSegment.appendChild(node)
     }
 
     return {
@@ -110,29 +102,33 @@
 
   const prepareAnimator = ({ animator, nodes }) => {
     if (animator._startLine === animator._source.linesOfCode.length - codeSegmentMaxLines) {
-      animator = resetAnimator(animator)
+      const lines = animator._linesToShow
+      animator = randomAnimator()
+      animator._linesToShow = lines
     }
     return {
       animator,
       nodes,
     }
   }
+  
+  const randomAnimator = () => {
+    const snippet = pickRandom(CODE_SNIPPETS)
+    const source = pickRandom(snippet.sourceFiles)
+    return codeAnimator(snippet.languageName, source)
+  }
 
   const pickRandom = (list) => {
-    const index = Math.floor((Math.random() * 100000) % list.length)
+    const index = Math.floor(Math.random() * list.length)
     return list[index]
   }
 
+  const main = () => {
+    let animator = randomAnimator()
+    let sched = schedule({ animator, nodes: [] }, 75, [ drawCode, prepareAnimator ])
 
-  const snippet = pickRandom(CODE_SNIPPETS)
-  const source = pickRandom(snippet.sourceFiles)
-
-  let animator = codeAnimator(snippet.languageName, source)
-  let state = {
-    animator,
-    nodes: [],
+    _run(sched)
   }
-  let sched = schedule(state, 150, [ drawCode, prepareAnimator ])
 
-  _run(sched)
+  main()
 })()
