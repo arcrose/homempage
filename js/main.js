@@ -62,7 +62,7 @@
       lineNumber: 0,
     }
 
-    const { nodes, lineNumber } = FN.reduce(codeToText, source, init)
+    const { nodes } = FN.reduce(codeToText, source, init)
     return {
       animator,
       nodes,
@@ -88,24 +88,19 @@
   const drawCode = ({ animator, nodes }) => {
     const { animator: a, nodes: n } = _animatorStep(animator)
 
-    for (const node of n) {
-      codeSegment.appendChild(node)
-      nodes.push(node)
+    let newNodes = []
+    for (let i = 0; i < nodes.length; i++) {
+      nodes[i].remove();
+      newNodes.push(n[i])
+      codeSegment.appendChild(n[i])
+    }
+    if (n.length > nodes.length) {
+      newNodes.push(n[n.length - 1])
     }
 
     return {
       animator: a,
-      nodes: nodes,
-    }
-  }
-
-  const clearText = ({ animator, nodes }) => {
-    for (let i = 0; i < nodes.length; i++) {
-      nodes[i].remove()
-    }
-    return {
-      animator,
-      nodes: [],
+      nodes: newNodes,
     }
   }
 
@@ -116,7 +111,7 @@
     animator,
     nodes: [],
   }
-  let sched = schedule(state, 500, [ drawCode, clearText ])
+  let sched = schedule(state, 300, [ drawCode ])
 
   _run(sched)
 })()
