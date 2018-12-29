@@ -1,0 +1,7 @@
+Let us now consider finite state transducers, which we are already familiar
+with from the field of natural language processing. Formally, a finite
+state transducer is defined as a six-tuple containing a set of states, an
+input alphabet, an output alphabet, a set of starting states, a set of final
+states, and a set of relations between states and members of the input alphabet
+to pairs of a state and members of the output alphabet. In Haskell, we might
+directly model such a structure with some type synonyms and a data type.

@@ -1,0 +1,28 @@
+Here, we are supposing that our imaginary APIError implements the std::convert::From
+trait in such a way  that we can convert from either an HTTP request error, a
+response reading error, or a JSON decode error into APIError.
+Hopefully it is relatively clear that what this code is doing is, after setting
+up an HTTP client and the endpoint URL string, it sends an HTTP GET request and
+then attempts to read the response's body before parsing it, treating it as JSON,
+into an Address struct.  Because we are method chaining on the Result type, we
+never actually stop working with a Result. That means, at the end of the sequence
+of method invocation, we can simply return the final Result instance, after having
+applied any appropriate closures (supplied to and_then, map, and map_err).
+This approach felt, to me, anyway, like the best way to do things after having
+written a lot of backend Javascript using Promises.  The approach is sufficiently
+effective to handle all of the variants a Result can take, and even lets us fairly
+elegantly (i.e. without unwrapping) chain operations on each variant using Rust's
+closures. However, with regards to elegance, code written in this style can quickly
+become quite unappealing and hard to deal with as we indent several times in order
+to apply operations to intermediate results (such as that of response.read_to_string)
+in order to maintain a consistent Result type. Note that get_location_info must
+return an APIError in its Err variant, so we must invoke Result.map_err in order
+to do type conversions, and use Result.map to ignore an unwanted intermediate
+value in favor of another (in our case, the body of a response, rather than the
+success result of having read it).  This approach also suffers from an unfortunate
+functional failure in that it makes our code difficult to refactor.  Suppose we
+wanted to not just return an Address in the Ok variant, but perhaps also the
+response's status code?  I'll leave it as an exercise to the reader to figure
+out how we'd do that.
+The use of method chaining is perhaps best left to shorter transformations where
+we might not mind losing information between each chained transformation.

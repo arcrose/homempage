@@ -6,6 +6,7 @@ extern crate serde;
 extern crate serde_json;
 
 mod code;
+mod writing;
 
 use std::fs;
 use std::io::Write;
@@ -74,12 +75,9 @@ fn not_found() -> Redirect {
 }
 
 fn main() {
-  let analysis = code::analyze("./snippets")
-    .map(|dirs| serde_json::to_vec(&dirs).unwrap());
-  let source_dirs = match analysis {
-    Ok(source_dirs) => source_dirs,
-    Err(error)      => panic!("Code analysis failed: {}", error),
-  };
+  let source_dirs = code::analyze("./snippets")
+    .map(|dirs| serde_json::to_vec(&dirs).unwrap())
+    .expect("Code analysis failed");
   let mut code_snippets_js = fs::OpenOptions::new()
     .write(true)
     .create(true)
@@ -87,6 +85,17 @@ fn main() {
     .expect("Could not open js/code_snippets.js");
   code_snippets_js.write(b"const CODE_SNIPPETS = ").unwrap();
   code_snippets_js.write_all(&source_dirs).unwrap();
+
+  let writing_samples = writing::collect("./writing")
+    .map(|samples| serde_json::to_vec(&samples).unwrap())
+    .expect("Failed to load writing samples");
+  let mut writing_samples_js = fs::OpenOptions::new()
+    .write(true)
+    .create(true)
+    .open("./js/writing_samples.js")
+    .expect("Could not open js/writing_samples.js");
+  writing_samples_js.write(b"const WRITING_SAMPLES = ").unwrap();
+  writing_samples_js.write_all(&writing_samples).unwrap();
 
   rocket::ignite()
     .register(catchers![not_found])

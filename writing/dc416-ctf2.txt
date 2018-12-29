@@ -1,0 +1,16 @@
+This weekend, on September 10, 2016, the Defcon Toronto Meetup group hosted their
+first ever CTF!  I was able to put together a team including myself, my friend
+David, and Anna, someone who happened to be broadcasting their interest in the CTF
+via the group's Slack channel (and doesn't have Twitter). David himself is actually
+heavily involved in Carleton University's CTF team, however neither I nor Anna
+have participated in a CTF before, though both of us have done some web appsec challenges.
+The whole event took place over the course of eight hours which my team spent
+frantically searching for clues and finding flags.  It is obvious in our unorthodox
+approaches to things that neither Anna nor I had partaken in a CTF before, but
+fortunately David had some familiarity with enough tools to get us through some
+trickier challenges.
+
+Despite all of our fumbling, my team actually managed to come out in first place!
+We had a great time and were competing down to the wire to come out ahead.
+I'll post a link to David's writeup when he gets to it, as well as Anna's if
+she writes one, but for now I'll write about the challenges I can recall in detail.

@@ -1,0 +1,29 @@
+To begin our discussion, let us first address the question of what functional
+programming is. While fractions of the functional programming community have
+not reached total consensus with regards to exactly what attributes uniquely
+define the field, there are a few key traits that are widely accepted. First
+is the focus on and support for higher-order and first class functions, which
+accept other functions as parameters and can return functions. Second is the
+focus on purity. The phrase referential transparency is often used here to
+describe the feature that functions do not have side-effects and will always
+return the same result when called on the same input, giving them the property
+of being much more like functions of the mathematical variety. A third
+attribute of the functional style is that recursion is preferred to iteration.
+We will see that recursive functions can embody all of the functionality of
+iterative functions and that a particular variety of recursive functions-
+namely, folds- have some very powerful properties. Functional programs also
+tend to be written in a declarative style rather than an imperative one.
+This means that, rather than writing code that tells the computer exactly how
+to compute something, our functions describe what it is that is to be computed.
+Functional programming also encourages the separation of functionality from
+data- quite the opposite of object-oriented languages that encourage the
+notion that the two should be combined. As a result of this property, it is
+often said that everything in a functional programming language is a value.
+This statement is critical to our understanding of the role functions play in
+programs, as functions are themselves values subject to being operated on with
+operations such as composition. Functional programming languages also often
+feature powerful type systems, such as that of Haskell, but can
+be dynamically typed as Clojure is.
+In our first case study, we will have a look at the incredibly important
+fold function, which embodies a great deal of the features of a functional
+programming language outlined above.

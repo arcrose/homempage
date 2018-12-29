@@ -1,0 +1,40 @@
+As a subject for further research, one might investigate the potential to frame
+finite state transducers in the framework of the kind of transducer we have
+explored in this paper. It is my suspicion that one could implement transition
+relations in terms of reducing functions quite naturally. In particular, we can
+see how a simple transition such as (q1, a:b, q2) could be implemented as a
+mapping that accepts the value [(a, q1)] and returns [(b, q2)]. Similarly, a
+transition such as (q1, a:E, q2) that deletes the character 'a' could be
+implemented as a filtering. A non-deterministic FST that allows for multiple
+transitions with the same upper or lower string would just be a flatmapping,
+or a flatmapping composed with a filtering if epsilon transitions are allowed.
+It may even be possible to implement FSTs simply by returning to the formal
+definition we saw earlier. In this construction, we would be able to implement
+the set of transition relations as one composed transducer. However, because
+this approach would result in a single entity- the composed transducer- that,
+based on what I've read so far, I do not believe would be possible to decompose
+for FST operations such as composition. However, it may be possible to implement
+operations such as intersection and union very simply using transducer
+composition. The exact details of how these operations on finite state
+transducers could be implemented would need to be explored but, because we are
+working with an abstraction of the fold function we saw much earlier, we would
+have a powerful foundation to reason formally about our constructions and both
+investigate and prove their properties.
+Transducers provide us with a new way to think about problems that can be
+formalized as a fold. Interestingly, a finite state transducer expressed as a
+transducer would require no more space to store than the transducer itself,
+which is simply a function. We would not be required to create a graph data
+structure to represent the FST, which would clearly mean saving an incredible
+amount of memory. An interesting observation is that, due to our choice of the
+[Integer] type to represent states, the composition of two simple FSTs with
+states such as [1] and [2] would have states [1, 1], [1, 2], [2, 1], and
+[2, 2]. This means that the composed transition relations would have to be
+constructed to perform no operations on states with only one identifier, and
+only transition on states containing two identifiers. In this sort of
+construction, the complexity of our transducer would grow, but it would be
+rather simple to create a composed FST by composing a transducer that performs
+these composed operations onto either of the original FSTs- or, perhaps, their
+composition. Clearly, there is a great deal to consider in working to formulate
+FSTs as transducers, however these thoughts lead me to believe that there may
+in fact be a number of interesting properties to be discovered with regards
+to FSTs represented as transducers.

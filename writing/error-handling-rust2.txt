@@ -1,0 +1,34 @@
+A lot of the Rust code you are likely to find yourself writing will involve
+functions that return a Result. This will especially be the case when you
+are building or working with a library.  In the majority of those cases,
+you're going to want to be performing transformations on the value contained
+within a Result's Ok variant, or else return the first Err you encounter,
+converted into the Error type that your codebase abstracts errors under. 
+In those cases, you should prefer the ? syntax for its elegance.  Of course,
+the other means of handling errors cannot be neglected.  They still have
+their place.  Perhaps you want to perform some transformation on the value
+contained in an Ok but don't want to have to store the intermediate value.
+In that case, it's probably most elegant to write the following.
+let modified_value = do_some_thing().map(safely_manipulate)?;
+Moreover, when you're implementing an application, your main function in
+particular is probably going to want to completely deconstruct the contents
+of some Result, since it certainly isn't going to propagate an error.  For
+example, while you might have a function to load a configuration file into
+a Config struct that you've defined which will propagate any errors it
+encounters, your main function would probably want to check for an error
+and terminate the program if one occurred.
+I hope that this post has been effective at introducing you to the most
+common ways to handle/propagate errors in Rust.  The language features
+so many ways to deconstruct or else propagate Results precisely because
+there are so many ways that someone may want to address a potentially
+failed operation. It is very much worth your time to understand how pattern
+matching can be helpful to you, since both match and if let are useful for
+much more than just deconstructing errors. Likewise, it is worth your
+energy to try to design abstractions that propagate errors, and to
+understand when you should use the new ? syntax and when you might want
+to use Result.and_then, Result.map, Result.map_err and similar methods.
+Finally, there is an excellent section in the Rust book on the subject of
+error handling, which goes into a lot more detail about some of the things
+I alluded to here.  You should familiarize yourself with the content present
+there and may wish to return to this post until you find a style that works
+for you in the kinds of situations you deal with when writing Rust code.
