@@ -28,32 +28,38 @@
   }
 
   const writing = (lineNumber, lineText) => {
-    const startX = 3
-    const startY = 97 - lineNumber * segmentIdentLineDelta[1]
+    const startX = 5 + 0.5 * lineNumber * segmentIdentLineDelta[0]
+    const startY = 98 - lineNumber * segmentIdentLineDelta[1]
   
     return text(startX, startY, 'writing', lineText)
   }
 
   // Construct a representation of a state machine that can be operated on
   // to animate text scrolling through the code segment.
-  const codeAnimator = (language, source) => ({
-    _startLine: segmentMaxLines,
-    _linesBuffer: source.linesOfCode.slice(0, segmentMaxLines),
-    _language: language,
-    _source: source,
-  })
+  const codeAnimator = (language, source) => {
+    const start = Math.min(segmentMaxLines, source.linesOfCode.length)
+    return {
+      _startLine: start,
+      _linesBuffer: source.linesOfCode.slice(0, start),
+      _language: language,
+      _source: source,
+    }
+  }
 
-  const writingAnimator = sample => ({
-    _startLine: segmentMaxLines,
-    _linesBuffer: sample.lines.slice(0, segmentMaxLines),
-    _sample: sample,
-  })
+  const writingAnimator = sample => {
+    const start = Math.min(segmentMaxLines, sample.lines.length)
+    let buffer = sample.lines.slice(0, start)
+    for (let i = 0; i < segmentMaxLines - buffer.length; i++) {
+      buffer.push({ line: '' })
+    }
+    return {
+      _startLine: 0,
+      _linesBuffer: buffer,
+      _sample: sample,
+    }
+  }
 
   const _codeAnimatorStep = animator => {
-    animator._linesBuffer = animator._linesBuffer.slice(1)
-    animator._linesBuffer.push(animator._source.linesOfCode[animator._startLine])
-    animator._startLine++
-
     const codeToText = (state, line) => {
       state.nodes.push(code(state.lineNumber, line.indent, line.code))
       return {
@@ -68,6 +74,11 @@
     }
 
     const { nodes } = FN.reduce(codeToText, animator._linesBuffer, init)
+    
+    animator._linesBuffer = animator._linesBuffer.slice(1)
+    animator._linesBuffer.push(animator._source.linesOfCode[animator._startLine])
+    animator._startLine++
+
     return {
       animator,
       nodes,
@@ -75,12 +86,8 @@
   }
 
   const _writingAnimatorStep = animator => {
-    animator._linesBuffer = animator._linesBuffer.slice(1)
-    animator._linesBuffer.push(animator._sample[animator._startLine])
-    animator._startLine++
-
     const writingToText = (state, line) => {
-      if (typeof line !== 'undefined') {
+      if (typeof line !== 'undefined' && typeof line.text !== 'undefined') {
         state.nodes.push(writing(state.lineNumber, line.text))
       }
       return {
@@ -94,8 +101,11 @@
       lineNumber: 0,
     }
 
-    console.log('linesBuffer', animator._linesBuffer)
     const { nodes } = FN.reduce(writingToText, animator._linesBuffer, init)
+
+    animator._linesBuffer = animator._linesBuffer.slice(1)
+    animator._linesBuffer.push(animator._sample.lines[animator._startLine])
+    animator._startLine++
 
     return {
       animator,
@@ -146,16 +156,19 @@
     const { animator: a, nodes: n } = _writingAnimatorStep(animator)
 
     let newNodes = []
-    for (let i = 0; i < nodes.length; i++) {
-      nodes[i].remove();
-
-      const node = n[i]
-      newNodes.push(node)
-      writingSegment.appendChild(node)
+    const minIndex = Math.min(n.length, nodes.length)
+    for (let i = minIndex - 1; i >= 0; i--) {
+      nodes[i].remove()
+      newNodes.push(n[i])
     }
     if (n.length > nodes.length) {
-      const node = n[n.length - 1]
-      newNodes.push(node)
+      newNodes.push(n[n.length - 1])
+    } else if (nodes.length > n.length) {
+      for (let i = n.length; i < nodes.length; i++) {
+        nodes[i].remove()
+      }
+    }
+    for (const node of newNodes) {
       writingSegment.appendChild(node)
     }
 
@@ -202,8 +215,8 @@
   }
 
   const prepareWritingAnimator = ({ animator, nodes }) => {
-    if (animator._startLine === animator._sample.lines.length - segmentMaxLines) {
-      animator = resetWritingAnimator(samples, animator)
+    if (animator._startLine >= animator._sample.lines.length - segmentMaxLines) {
+      animator = resetWritingAnimator(animator)
     }
     return {
       animator,
@@ -218,7 +231,7 @@
     return animator
   }
 
-  const resetWriting = animator => {
+  const resetWritingAnimator = animator => {
     animator._sample = pickRandom(WRITING_SAMPLES)
     animator._startLine = 0
     return animator
@@ -236,19 +249,17 @@
     let codeA = codeAnimator(snippet.languageName, source)
     let { animator: newCodeA, nodes: codeNodes } = drawAllCode(codeA)
 
-    let sched = schedule({ animator: newCodeA, nodes: codeNodes }, 75, [ drawCode, prepareCodeAnimator ])
+    let sched = schedule({ animator: newCodeA, nodes: codeNodes }, 200, [ drawCode, prepareCodeAnimator ])
 
     _run(sched)
 
 
     const sample = pickRandom(WRITING_SAMPLES)
-    console.log('Using sample', sample)
-    console.log('Any lines undefined?', typeof sample.lines.find(line => typeof line === 'undefined') === 'undefined')
 
     let writingA = writingAnimator(sample)
     let { animator: newWritingA, nodes: writingNodes } = drawAllWriting(writingA)
 
-    sched = schedule({ animator: newWritingA, nodes: writingNodes }, 75, [ drawWriting, prepareWritingAnimator ])
+    sched = schedule({ animator: newWritingA, nodes: writingNodes }, 200, [ drawWriting, prepareWritingAnimator ])
 
     _run(sched)
   }
